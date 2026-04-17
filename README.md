@@ -2,7 +2,7 @@
 
 > A premium, MNC-level Snake game built with **pure HTML, CSS & JavaScript** — no frameworks, no libraries.
 
-🎮 **[Play Live](https://your-username.github.io/neon-snake-pro)** ← *(update after deploying)*
+🎮 **[Play Live](https://revanthh04.github.io/neon-snake-pro/)** &nbsp;|&nbsp; ⭐ **[GitHub Repo](https://github.com/revanthh04/neon-snake-pro)**
 
 ---
 
@@ -106,7 +106,7 @@ neon-snake-pro/
 ## 👨‍💻 Author
 
 **Revanth** — Built as an MNC portfolio project  
-GitHub: [@your-username](https://github.com/your-username)
+GitHub: [@revanthh04](https://github.com/revanthh04)
 
 ---
 
