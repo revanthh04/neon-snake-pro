@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Snake Pro — MNC Edition</title>
+  <meta name="description" content="Advanced Snake with AI autopilot, BFS pathfinding, multiple maps, power-ups, themes, and leaderboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="game-wrapper">
+
+    <!-- ── Header ── -->
+    <header class="game-header">
+      <h1 class="game-title">
+        <span class="title-neon">NEON</span>
+        <span class="title-snake">SNAKE</span>
+        <sup class="title-pro">PRO</sup>
+      </h1>
+
+      <div class="header-right">
+        <!-- Theme switcher -->
+        <div class="theme-switcher" id="theme-switcher">
+          <button class="theme-btn active" data-theme="neon"    title="Neon Theme">🌌</button>
+          <button class="theme-btn"        data-theme="inferno" title="Inferno Theme">🔥</button>
+          <button class="theme-btn"        data-theme="ocean"   title="Ocean Theme">🌊</button>
+        </div>
+
+        <!-- Score board -->
+        <div class="score-board">
+          <div class="score-item">
+            <span class="score-label">SCORE</span>
+            <span class="score-value" id="score">0</span>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <span class="score-label">BEST</span>
+            <span class="score-value highlight" id="high-score">0</span>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <span class="score-label">LEVEL</span>
+            <span class="score-value accent" id="level">1</span>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="header-actions">
+          <button class="icon-btn" id="ai-toggle-btn" title="Toggle AI (A key)">🤖</button>
+          <button class="icon-btn" id="mute-btn"      title="Toggle Sound (M key)">🔊</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Map tabs ── -->
+    <nav class="map-tabs" id="map-tabs">
+      <button class="map-tab active" data-map="classic">⬜ Classic</button>
+      <button class="map-tab"        data-map="walls">🧱 Walls</button>
+      <button class="map-tab"        data-map="wrap">🔄 Wrap</button>
+      <button class="map-tab"        data-map="maze">🗺️ Maze</button>
+    </nav>
+
+    <!-- ── Main area ── -->
+    <main class="game-main">
+
+      <!-- Canvas + overlays -->
+      <div class="canvas-container" id="canvas-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- AI badge -->
+        <div class="ai-badge hidden" id="ai-badge">🤖 AI PLAYING</div>
+
+        <!-- START screen -->
+        <div class="overlay" id="start-screen">
+          <div class="overlay-content">
+            <div class="snake-icon">🐍</div>
+            <h2>NEON SNAKE PRO</h2>
+            <div class="name-input-group">
+              <input type="text" id="player-name" placeholder="Enter your name…" maxlength="12" autocomplete="off" spellcheck="false" />
+            </div>
+            <p class="overlay-sub">
+              <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move
+            </p>
+            <button class="btn-start" id="start-btn">
+              <span class="btn-glow"></span>START GAME
+            </button>
+            <p class="overlay-hint">Press <kbd>Space</kbd> to begin · <kbd>A</kbd> toggles AI</p>
+          </div>
+        </div>
+
+        <!-- PAUSE screen -->
+        <div class="overlay hidden" id="pause-screen">
+          <div class="overlay-content">
+            <div class="pause-icon">⏸</div>
+            <h2>Paused</h2>
+            <p class="overlay-sub">Press <kbd>P</kbd> or <kbd>Space</kbd> to resume</p>
+            <button class="btn-start" id="resume-btn">RESUME</button>
+          </div>
+        </div>
+
+        <!-- GAME OVER screen -->
+        <div class="overlay hidden" id="game-over-screen">
+          <div class="overlay-content">
+            <div class="dead-icon">💀</div>
+            <h2>Game Over</h2>
+            <div class="final-stats">
+              <div class="stat"><span class="stat-label">Score</span><span class="stat-value" id="final-score">0</span></div>
+              <div class="stat"><span class="stat-label">Best</span><span class="stat-value highlight" id="final-best">0</span></div>
+              <div class="stat"><span class="stat-label">Level</span><span class="stat-value accent" id="final-level">1</span></div>
+            </div>
+            <div id="new-record-badge" class="new-record hidden">🏆 NEW RECORD!</div>
+            <div class="gameover-leaderboard">
+              <div class="lb-section-title">🏆 LEADERBOARD</div>
+              <div id="gameover-lb-list"></div>
+            </div>
+            <button class="btn-start" id="restart-btn">
+              <span class="btn-glow"></span>PLAY AGAIN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Sidebar ── -->
+      <aside class="controls-panel">
+
+        <!-- Active power-ups -->
+        <div class="control-group">
+          <div class="control-title">⚡ ACTIVE POWERS</div>
+          <div id="powerup-status"><span class="no-powers">None active</span></div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="control-group">
+          <div class="control-title">🏆 TOP SCORES</div>
+          <div id="leaderboard-list"><span class="no-scores">No scores yet</span></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="control-group">
+          <div class="control-title">CONTROLS</div>
+          <div class="control-grid">
+            <div class="key-empty"></div><div class="key-btn">↑</div><div class="key-empty"></div>
+            <div class="key-btn">←</div><div class="key-btn">↓</div><div class="key-btn">→</div>
+          </div>
+          <div class="control-extra"><span class="key-badge">P</span> Pause</div>
+          <div class="control-extra"><span class="key-badge">A</span> AI Mode</div>
+          <div class="control-extra"><span class="key-badge">M</span> Mute</div>
+        </div>
+
+        <!-- Items legend -->
+        <div class="control-group">
+          <div class="control-title">ITEMS</div>
+          <div class="food-legend">
+            <div class="food-item"><span class="food-dot normal"></span> Food (+1)</div>
+            <div class="food-item"><span class="food-dot bonus"></span> Bonus (+3)</div>
+            <div class="food-item"><span class="pu-legend speed">⚡</span> Speed</div>
+            <div class="food-item"><span class="pu-legend shield">🛡</span> Shield</div>
+            <div class="food-item"><span class="pu-legend ghost">👻</span> Ghost</div>
+            <div class="food-item"><span class="pu-legend shrink">✂</span> Shrink</div>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
